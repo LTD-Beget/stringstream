@@ -8,7 +8,6 @@
 namespace LTDBeget\stringstream;
 
 
-use Hoa\Ustring\Ustring;
 use LTDBeget\ascii\AsciiChar;
 
 /**
@@ -22,11 +21,10 @@ class StringStream
      * StringStream constructor.
      * @param string $string
      * @throws \BadMethodCallException
-     * @throws \Hoa\Ustring\Exception
      */
     public function __construct(string $string)
     {
-        $this->stream = (new Ustring($string))->getIterator();
+        $this->stream = new \ArrayIterator(preg_split('#(?<!^)(?!$)#u', $string));
         $this->pointerAtStart = true;
         $this->pointerAtEnd = false;
     }
@@ -43,7 +41,7 @@ class StringStream
     /**
      * @return int
      */
-    public function ord() : int 
+    public function ord() : int
     {
         return ord($this->current());
     }
