@@ -32,9 +32,8 @@ class StringStream
      * Current char of stream
      * @return string|null
      */
-    public function current() : ?string
+    public function current()
     {
-        //return current($this->stream);
         return $this->stream->current();
     }
 
@@ -72,8 +71,6 @@ class StringStream
     public function next()
     {
         $this->pointerAtStart = false;
-
-        //var_dump($this->stream->key() . " - " . $this->stream->count());
         if ($this->stream->key() === $this->stream->count() - 1) {
             $this->pointerAtEnd = true;
         } else {
@@ -88,8 +85,6 @@ class StringStream
     public function previous()
     {
         $this->pointerAtEnd = false;
-        // $this->pointerAtStart = prev($this->stream) === false;
-
         $this->pointerAtStart = false;
         if ($this->stream->key() == 0) {
             $this->pointerAtStart = true;
@@ -104,7 +99,6 @@ class StringStream
      */
     public function start()
     {
-        //reset($this->stream);
         $this->stream->rewind();
     }
 
@@ -122,7 +116,6 @@ class StringStream
      */
     public function end()
     {
-        //end($this->stream);
         $this->stream->seek($this->stream->count() - 1);
     }
 
