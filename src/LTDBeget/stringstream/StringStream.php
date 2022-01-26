@@ -1,197 +1,174 @@
 <?php
 /**
  * @author: Viskov Sergey
- * @date: 3/18/16
- * @time: 1:15 PM
+ * @date  : 3/18/16
+ * @time  : 1:15 PM
  */
 
 namespace LTDBeget\stringstream;
 
-use ArrayIterator;
 use LTDBeget\ascii\AsciiChar;
 
 /**
  * String stream data structure
  * Class StringStream
+ *
  * @package LTDBeget\stringstream
  */
 class StringStream
 {
+    private array $stream;
+    private int $position;
+    private int $length;
+
     /**
      * StringStream constructor.
-     * @param string $string
      */
     public function __construct(string $string)
     {
-        $this->stream = $this->makeIterator($string);
-        $this->pointerAtStart = true;
-        $this->pointerAtEnd = false;
+        $this->stream = $this->splitString($string);
+        $this->length = count($this->stream);
+        $this->position = 0;
     }
 
     /**
-     * Current char of stream
-     * @return string
+     * Current char of stream or empty string if end is reached
      */
-    public function current() : string
+    public function current(): string
     {
-        return $this->stream->current();
+        return $this->stream[$this->position] ?? '';
     }
 
     /**
-     * @return int
+     * ASCII code of current char
      */
-    public function ord() : int
+    public function ord(): int
     {
-        return ord($this->current());
+        $current = $this->current();
+
+        return $current === '' ? 0 : ord($current);
     }
 
     /**
      * Current char of stream as AsciiChar
-     * @return AsciiChar
+     *
      * @throws \LogicException
      * @throws \InvalidArgumentException
      */
-    public function currentAscii() : AsciiChar
+    public function currentAscii(): AsciiChar
     {
         return AsciiChar::get($this->ord());
     }
 
     /**
      * Position in stream of current char
-     * @return int
      */
-    public function position() : int
+    public function position(): int
     {
-        return $this->stream->key();
+        return $this->position;
     }
 
     /**
-     * go to next char in stream
+     * Go to next char in stream
      */
-    public function next()
+    public function next(): void
     {
-        $this->pointerAtStart = false;
-        if ($this->stream->key() === $this->stream->count() - 1) {
-            $this->pointerAtEnd = true;
-        } else {
-            $this->pointerAtEnd = false;
-            $this->stream->next();
-        }
+        $this->position = min($this->length, $this->position + 1);
     }
 
     /**
-     * go to previous char of stream
+     * Go to previous char of stream
      */
-    public function previous()
+    public function previous(): void
     {
-        $this->pointerAtEnd = false;
-        if ($this->stream->key() == 0) {
-            $this->pointerAtStart = true;
-        } else {
-            $this->pointerAtStart = false;
-            $this->stream->seek($this->stream->key() - 1);
-        }
+        $this->position = max(0, $this->position - 1);
     }
 
     /**
-     * go to start of stream
+     * Go to start of stream
      */
-    public function start()
+    public function start(): void
     {
-        $this->stream->rewind();
+        $this->position = 0;
     }
 
     /**
-     * is start of stream
-     * @return bool
+     * Is start of stream
      */
-    public function isStart() : bool
+    public function isStart(): bool
     {
-        return $this->pointerAtStart;
+        return $this->position === 0;
     }
 
     /**
-     * go to end of stream
+     * Go to last character in stream
      */
-    public function end()
+    public function last(): void
     {
-        $this->stream->seek($this->stream->count() - 1);
+        $this->position = max(0, $this->length - 1);
     }
 
     /**
-     * is end of stream
-     * @return bool
+     * Go to position past last character in stream
      */
-    public function isEnd() : bool
+    public function end(): void
     {
-        return $this->pointerAtEnd;
+        $this->position = $this->length;
     }
 
     /**
-     * ignore chars in stream while it is white space
+     * Is end of stream
+     */
+    public function isEnd(): bool
+    {
+        return $this->position === $this->length;
+    }
+
+    /**
+     * Ignore chars in stream while it is white space
+     *
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function ignoreWhitespace()
+    public function ignoreWhitespace(): void
     {
-        ignoreWhitespace:
-        if (!$this->isEnd() && $this->currentAscii()->isWhiteSpace()) {
+        while (!$this->isEnd() && $this->currentAscii()->isWhiteSpace()) {
             $this->next();
-            goto ignoreWhitespace;
         }
     }
 
     /**
-     * ignore chars in stream while it is horizontal space
+     * Ignore chars in stream while it is horizontal space
+     *
      * @throws \LogicException
      * @throws \InvalidArgumentException
      */
-    public function ignoreHorizontalSpace()
+    public function ignoreHorizontalSpace(): void
     {
-        ignoreHorizontalSpace:
-        if (!$this->isEnd() && $this->currentAscii()->isHorizontalSpace()) {
+        while (!$this->isEnd() && $this->currentAscii()->isHorizontalSpace()) {
             $this->next();
-            goto ignoreHorizontalSpace;
         }
     }
 
     /**
-     * ignore chars in stream while it is vertical space
+     * Ignore chars in stream while it is vertical space
+     *
      * @throws \InvalidArgumentException
      * @throws \LogicException
      */
-    public function ignoreVerticalSpace()
+    public function ignoreVerticalSpace(): void
     {
-        ignoreHorizontalSpace:
-        if (!$this->isEnd() && $this->currentAscii()->isVerticalSpace()) {
+        while (!$this->isEnd() && $this->currentAscii()->isVerticalSpace()) {
             $this->next();
-            goto ignoreHorizontalSpace;
         }
     }
 
-    /**
-     * @param string $string
-     * @return ArrayIterator
-     */
-    private function makeIterator(string $string) : ArrayIterator
+    private function splitString(string $string): array
     {
-        return new ArrayIterator(preg_split('#(?<!^)(?!$)#u', $string));
+        if ($string === '') {
+            return [];
+        }
+
+        return (array)(preg_split('#(?<!^)(?!$)#u', $string));
     }
-
-    /**
-     * @var ArrayIterator
-     */
-    private $stream;
-
-    /**
-     * if next returns false it member will be true, else false
-     * @var bool
-     */
-    private $pointerAtEnd;
-
-    /**
-     * if prev returns false it member will be true, else false
-     * @var bool
-     */
-    private $pointerAtStart;
 }

@@ -1,0 +1,29 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  test:
+    name: Test on PHP version
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php: [ "7.4", "8.0", "8.1" ]
+      fail-fast: false
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Run unit tests
+        run: composer run-script test

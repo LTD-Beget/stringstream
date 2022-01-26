@@ -1,6 +1,7 @@
 {
   "name": "ltd-beget/stringstream",
   "type": "library",
+  "license": "MIT",
   "description": "Php Stringstream data structure.",
   "keywords": [
     "stringstream",
@@ -13,15 +14,23 @@
     }
   ],
   "require": {
-    "php": ">=7.0",
-    "ltd-beget/ascii-table": "1.*"
+    "php": ">=7.4",
+    "ltd-beget/ascii-table": "1.* || 2.*"
   },
   "require-dev": {
-    "theseer/phpdox": "0.8.*"
+    "phpunit/phpunit": "^9.5.0"
   },
   "autoload": {
     "psr-0": {
       "LTDBeget\\stringstream": "src"
     }
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "LTDBeget\\stringstream\\test": "src"
+    }
+  },
+  "scripts": {
+    "test": "phpunit"
   }
 }

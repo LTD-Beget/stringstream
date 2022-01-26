@@ -5,3 +5,4 @@ composer.lock
 composer.phar
 runtime
 index.php
+.phpunit.cache
