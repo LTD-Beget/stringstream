@@ -15,7 +15,7 @@
   ],
   "require": {
     "php": ">=7.4",
-    "ltd-beget/ascii-table": "1.* || 2.*"
+    "ltd-beget/ascii-table": "^1.0 || ^2.0 || dev-BH-15288"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5.0"
